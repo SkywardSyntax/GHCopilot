@@ -17,9 +17,13 @@ export function useAuth() {
   const checkAuth = useCallback(async () => {
     try {
       const res = await fetch("/api/auth/status", { credentials: "include" });
+      if (!res.ok) {
+        setState({ authenticated: false, user: null, loading: false });
+        return;
+      }
       const data = await res.json();
       setState({
-        authenticated: data.authenticated,
+        authenticated: data.authenticated === true,
         user: data.user || null,
         loading: false,
       });
@@ -37,10 +41,14 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    await fetch("/api/auth/logout", {
-      method: "POST",
-      credentials: "include",
-    });
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch {
+      // Logout locally regardless of network errors
+    }
     setState({ authenticated: false, user: null, loading: false });
   };
 

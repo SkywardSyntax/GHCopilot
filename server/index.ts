@@ -8,16 +8,22 @@ import { chatRouter } from "./chat.js";
 
 const app = express();
 const PORT = parseInt(process.env.PORT || "3001");
+const CORS_ORIGIN = process.env.CORS_ORIGIN || "http://localhost:5173";
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-app.use(express.json());
+app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(
   session({
     secret: process.env.SESSION_SECRET || "dev-secret-change-me",
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false, httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    },
   })
 );
 

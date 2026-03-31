@@ -12,7 +12,7 @@ export default function App() {
     if (auth.authenticated) {
       chat.fetchSessions();
     }
-  }, [auth.authenticated]);
+  }, [auth.authenticated, chat.fetchSessions]);
 
   if (auth.loading) {
     return (
@@ -25,7 +25,7 @@ export default function App() {
     );
   }
 
-  if (!auth.authenticated) {
+  if (!auth.authenticated || !auth.user) {
     return <Login onLogin={auth.login} />;
   }
 
